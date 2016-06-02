@@ -27,6 +27,7 @@ def matching():
 
 # 比較されるImageFile
 def gen_target():
+    yield image_path + 'b.jpg'
     yield image_path + 'c.jpg'
     yield image_path + '9a7dbba0ec3589372c20eed3c32f2f7e1.jpg'
     yield image_path + '621b78ce7c250b0db4025cd2ffd2a46a1.jpg'
@@ -55,4 +56,5 @@ def compare_hist(hist1, hist2):
 
 
 if __name__ == '__main__':
-    print(matching())
+    for i in matching():
+        print(i)
