@@ -1,2 +1,7 @@
 img/
 .idea/
+csv_files/
+*.csv
+*.mp4
+*.json
+.python-version
