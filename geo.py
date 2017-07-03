@@ -4,6 +4,7 @@ from urllib.error import URLError
 from urllib.error import HTTPError
 import time
 import re
+import random
 
 site_url = 'http://rental.geo-online.co.jp/'
 
@@ -11,10 +12,11 @@ def get_web_esource(url):
     try:
         return urlopen(url)
     except HTTPError as e:
-        print(e)
+        error_log_f.write(str(e) + '\n')
         return None
     except URLError as e:
         print('The server could not be found!')
+        error_log_f.write('The server could not be found!\n')
         return None
 
 
@@ -120,30 +122,36 @@ def __write_csv(save_lists):
 
 def main():
     geo_url = 'http://rental.geo-online.co.jp/search2/q/c-dvd/d-desc/o-rating/p-'
-    geo_param = '/st-2/stk-1/'
     csv_file_name = 'geo.csv'
     page = 1
-    max_page = 2318
-    try:
-        global f
-        f = open('geo.csv', mode='a', encoding='utf8')
+    max_page = 2599
+    global f, error_log_f
+    f = open('geo.csv', mode='a', encoding='utf8')
+    error_log_f = open('geo_error.log', mode='a', encoding='utf8')
 
-        # while(page < max_page):
-        resource = get_web_esource(geo_url + str(page) + geo_param)
-        read_resource = resource.read()
-        bs_obj = BeautifulSoup(read_resource, 'lxml')
-        links = bs_obj.findAll('a', {'class': ['imagesLink', 'dvdmode']})
+    while(page < max_page):
+        try:
+            resource = get_web_esource(geo_url + str(page))
+            read_resource = resource.read()
+            bs_obj = BeautifulSoup(read_resource, 'lxml')
+            links = bs_obj.findAll('a', {'class': ['imagesLink', 'dvdmode']})
 
-        get_details_loop(links)
+            get_details_loop(links)
 
-        time.sleep(1)
-        page = page + 1
-    except AttributeError as e:
-        print(e)
-    except IOError as e:
-        print(e)
+            time.sleep(random.randint(1, 3))
+            page = page + 1
 
-    # f.close()
+        except AttributeError as e:
+            error_log_f.write(str(e) + '\n')
+
+        except IOError as e:
+            error_log_f.write(str(e) + '\n')
+
+        except Exception as e:
+            error_log_f.write(e + '\n')
+
+    f.close()
+    error_log_f.close()
 
 if __name__ == '__main__':
     main()
